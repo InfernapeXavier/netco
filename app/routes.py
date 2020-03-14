@@ -66,10 +66,11 @@ def index():
         return redirect(url_for("index"))
     page = request.args.get("page", 1, type=int)
     posts = current_user.followed_posts().paginate(
-        page, app.config["POSTS_PER_PAGE"], False
-    )
-    next_url = url_for("index", page=posts.next_num) if posts.has_next else None
-    prev_url = url_for("index", page=posts.prev_num) if posts.has_prev else None
+        page, app.config["POSTS_PER_PAGE"], False)
+    next_url = url_for("index",
+                       page=posts.next_num) if posts.has_next else None
+    prev_url = url_for("index",
+                       page=posts.prev_num) if posts.has_prev else None
     return render_template(
         "index.html",
         title=_("Home"),
@@ -86,7 +87,9 @@ def applications():
     if current_user.type == "student":
         return redirect(url_for("home"))
     users = User.query.all()
-    return render_template("applications.html", title=_("Applications"), users=users)
+    return render_template("applications.html",
+                           title=_("Applications"),
+                           users=users)
 
 
 @app.route("/home", methods=["GET", "POST"])
@@ -96,10 +99,11 @@ def home():
         return redirect(url_for("index"))
     page = request.args.get("page", 1, type=int)
     posts = current_user.followed_posts().paginate(
-        page, app.config["POSTS_PER_PAGE"], False
-    )
-    next_url = url_for("index", page=posts.next_num) if posts.has_next else None
-    prev_url = url_for("index", page=posts.prev_num) if posts.has_prev else None
+        page, app.config["POSTS_PER_PAGE"], False)
+    next_url = url_for("index",
+                       page=posts.next_num) if posts.has_next else None
+    prev_url = url_for("index",
+                       page=posts.prev_num) if posts.has_prev else None
     return render_template(
         "index.html",
         title=_("Home"),
@@ -142,9 +146,9 @@ def register():
         return redirect(url_for("index"))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(
-            username=form.username.data, email=form.email.data, type=form.type.data
-        )
+        user = User(username=form.username.data,
+                    email=form.email.data,
+                    type=form.type.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -159,21 +163,16 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get("page", 1, type=int)
     posts = user.posts.order_by(Post.timestamp.desc()).paginate(
-        page, app.config["POSTS_PER_PAGE"], False
-    )
-    next_url = (
-        url_for("user", username=user.username, page=posts.next_num)
-        if posts.has_next
-        else None
-    )
-    prev_url = (
-        url_for("user", username=user.username, page=posts.prev_num)
-        if posts.has_prev
-        else None
-    )
-    return render_template(
-        "user.html", user=user, posts=posts.items, next_url=next_url, prev_url=prev_url
-    )
+        page, app.config["POSTS_PER_PAGE"], False)
+    next_url = (url_for("user", username=user.username, page=posts.next_num)
+                if posts.has_next else None)
+    prev_url = (url_for("user", username=user.username, page=posts.prev_num)
+                if posts.has_prev else None)
+    return render_template("user.html",
+                           user=user,
+                           posts=posts.items,
+                           next_url=next_url,
+                           prev_url=prev_url)
 
 
 @app.route("/edit_profile", methods=["GET", "POST"])
@@ -196,7 +195,9 @@ def edit_profile():
         form.name.data = current_user.name
         form.departments.data = current_user.departments
 
-    return render_template("edit_profile.html", title=_("Edit Profile"), form=form)
+    return render_template("edit_profile.html",
+                           title=_("Edit Profile"),
+                           form=form)
 
 
 @app.route("/manage", methods=["GET", "POST"])
@@ -283,7 +284,9 @@ def unapply(username):
         return redirect(url_for("index"))
     current_user.unapply(user)
     db.session.commit()
-    flash(_("Successfully rescinded application for %(username)s.", username=username))
+    flash(
+        _("Successfully rescinded application for %(username)s.",
+          username=username))
     return redirect(url_for("user", username=username))
 
 
@@ -296,7 +299,9 @@ def deleteApplication(username):
         return redirect(url_for("index"))
     user.unapply(current_user)
     db.session.commit()
-    flash(_("Successfully deleted application for %(username)s.", username=username))
+    flash(
+        _("Successfully deleted application for %(username)s.",
+          username=username))
     return redirect(url_for("applications"))
 
 
@@ -305,10 +310,11 @@ def deleteApplication(username):
 def explore():
     page = request.args.get("page", 1, type=int)
     posts = Post.query.order_by(Post.timestamp.desc()).paginate(
-        page, app.config["POSTS_PER_PAGE"], False
-    )
-    next_url = url_for("explore", page=posts.next_num) if posts.has_next else None
-    prev_url = url_for("explore", page=posts.prev_num) if posts.has_prev else None
+        page, app.config["POSTS_PER_PAGE"], False)
+    next_url = url_for("explore",
+                       page=posts.next_num) if posts.has_next else None
+    prev_url = url_for("explore",
+                       page=posts.prev_num) if posts.has_prev else None
     return render_template(
         "index.html",
         title=_("Explore"),
@@ -329,9 +335,9 @@ def reset_password_request():
             send_password_reset_email(user)
         flash(_("Check your email for instructions!"))
         return redirect(url_for("login"))
-    return render_template(
-        "reset_password_request.html", title=_("Reset Password"), form=form
-    )
+    return render_template("reset_password_request.html",
+                           title=_("Reset Password"),
+                           form=form)
 
 
 @app.route("/reset_password/<token>", methods=["GET", "POST"])
